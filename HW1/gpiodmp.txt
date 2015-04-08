@@ -1,0 +1,485 @@
+
+a.out:     file format elf32-littlearm
+
+
+Disassembly of section .init:
+
+00008000 <_init>:
+    8000:	e1a0c00d 	mov	ip, sp
+    8004:	e92ddff8 	push	{r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr, pc}
+    8008:	e24cb004 	sub	fp, ip, #4
+    800c:	e24bd028 	sub	sp, fp, #40	; 0x28
+    8010:	e89d6ff0 	ldm	sp, {r4, r5, r6, r7, r8, r9, sl, fp, sp, lr}
+    8014:	e12fff1e 	bx	lr
+
+Disassembly of section .text:
+
+00008018 <exit>:
+    8018:	e92d4008 	push	{r3, lr}
+    801c:	e3a01000 	mov	r1, #0
+    8020:	e1a04000 	mov	r4, r0
+    8024:	eb000101 	bl	8430 <__call_exitprocs>
+    8028:	e59f3018 	ldr	r3, [pc, #24]	; 8048 <exit+0x30>
+    802c:	e5930000 	ldr	r0, [r3]
+    8030:	e590303c 	ldr	r3, [r0, #60]	; 0x3c
+    8034:	e3530000 	cmp	r3, #0
+    8038:	11a0e00f 	movne	lr, pc
+    803c:	112fff13 	bxne	r3
+    8040:	e1a00004 	mov	r0, r4
+    8044:	eb0001a6 	bl	86e4 <_exit>
+    8048:	00008704 	.word	0x00008704
+
+0000804c <register_fini>:
+    804c:	e92d4008 	push	{r3, lr}
+    8050:	e59f3010 	ldr	r3, [pc, #16]	; 8068 <register_fini+0x1c>
+    8054:	e3530000 	cmp	r3, #0
+    8058:	159f000c 	ldrne	r0, [pc, #12]	; 806c <register_fini+0x20>
+    805c:	1b00014e 	blne	859c <atexit>
+    8060:	e8bd4008 	pop	{r3, lr}
+    8064:	e12fff1e 	bx	lr
+    8068:	00000000 	.word	0x00000000
+    806c:	000085bc 	.word	0x000085bc
+
+00008070 <__do_global_dtors_aux>:
+    8070:	e92d4010 	push	{r4, lr}
+    8074:	e59f4028 	ldr	r4, [pc, #40]	; 80a4 <__do_global_dtors_aux+0x34>
+    8078:	e5d43000 	ldrb	r3, [r4]
+    807c:	e3530000 	cmp	r3, #0
+    8080:	1a000005 	bne	809c <__do_global_dtors_aux+0x2c>
+    8084:	e59f301c 	ldr	r3, [pc, #28]	; 80a8 <__do_global_dtors_aux+0x38>
+    8088:	e3530000 	cmp	r3, #0
+    808c:	159f0018 	ldrne	r0, [pc, #24]	; 80ac <__do_global_dtors_aux+0x3c>
+    8090:	11a00000 	movne	r0, r0
+    8094:	e3a03001 	mov	r3, #1
+    8098:	e5c43000 	strb	r3, [r4]
+    809c:	e8bd4010 	pop	{r4, lr}
+    80a0:	e12fff1e 	bx	lr
+    80a4:	00010b5c 	.word	0x00010b5c
+    80a8:	00000000 	.word	0x00000000
+    80ac:	00008710 	.word	0x00008710
+
+000080b0 <frame_dummy>:
+    80b0:	e59f303c 	ldr	r3, [pc, #60]	; 80f4 <frame_dummy+0x44>
+    80b4:	e3530000 	cmp	r3, #0
+    80b8:	e92d4010 	push	{r4, lr}
+    80bc:	159f0034 	ldrne	r0, [pc, #52]	; 80f8 <frame_dummy+0x48>
+    80c0:	159f1034 	ldrne	r1, [pc, #52]	; 80fc <frame_dummy+0x4c>
+    80c4:	11a00000 	movne	r0, r0
+    80c8:	e59f0030 	ldr	r0, [pc, #48]	; 8100 <frame_dummy+0x50>
+    80cc:	e5903000 	ldr	r3, [r0]
+    80d0:	e3530000 	cmp	r3, #0
+    80d4:	1a000001 	bne	80e0 <frame_dummy+0x30>
+    80d8:	e8bd4010 	pop	{r4, lr}
+    80dc:	e12fff1e 	bx	lr
+    80e0:	e59f301c 	ldr	r3, [pc, #28]	; 8104 <frame_dummy+0x54>
+    80e4:	e3530000 	cmp	r3, #0
+    80e8:	0afffffa 	beq	80d8 <frame_dummy+0x28>
+    80ec:	e8bd4010 	pop	{r4, lr}
+    80f0:	e12fff13 	bx	r3
+    80f4:	00000000 	.word	0x00000000
+    80f8:	00008710 	.word	0x00008710
+    80fc:	00010b60 	.word	0x00010b60
+    8100:	00010720 	.word	0x00010720
+    8104:	00000000 	.word	0x00000000
+
+00008108 <_mainCRTStartup>:
+    8108:	e59f30f0 	ldr	r3, [pc, #240]	; 8200 <_mainCRTStartup+0xf8>
+    810c:	e3530000 	cmp	r3, #0
+    8110:	059f30e4 	ldreq	r3, [pc, #228]	; 81fc <_mainCRTStartup+0xf4>
+    8114:	e1a0d003 	mov	sp, r3
+    8118:	e10f2000 	mrs	r2, CPSR
+    811c:	e312000f 	tst	r2, #15
+    8120:	0a000015 	beq	817c <_mainCRTStartup+0x74>
+    8124:	e321f0d1 	msr	CPSR_c, #209	; 0xd1
+    8128:	e1a0d003 	mov	sp, r3
+    812c:	e24daa01 	sub	sl, sp, #4096	; 0x1000
+    8130:	e1a0300a 	mov	r3, sl
+    8134:	e321f0d7 	msr	CPSR_c, #215	; 0xd7
+    8138:	e1a0d003 	mov	sp, r3
+    813c:	e2433a01 	sub	r3, r3, #4096	; 0x1000
+    8140:	e321f0db 	msr	CPSR_c, #219	; 0xdb
+    8144:	e1a0d003 	mov	sp, r3
+    8148:	e2433a01 	sub	r3, r3, #4096	; 0x1000
+    814c:	e321f0d2 	msr	CPSR_c, #210	; 0xd2
+    8150:	e1a0d003 	mov	sp, r3
+    8154:	e2433a02 	sub	r3, r3, #8192	; 0x2000
+    8158:	e321f0d3 	msr	CPSR_c, #211	; 0xd3
+    815c:	e1a0d003 	mov	sp, r3
+    8160:	e2433902 	sub	r3, r3, #32768	; 0x8000
+    8164:	e3c330ff 	bic	r3, r3, #255	; 0xff
+    8168:	e3c33cff 	bic	r3, r3, #65280	; 0xff00
+    816c:	e5033004 	str	r3, [r3, #-4]
+    8170:	e9532000 	ldmdb	r3, {sp}^
+    8174:	e38220c0 	orr	r2, r2, #192	; 0xc0
+    8178:	e121f002 	msr	CPSR_c, r2
+    817c:	e243a801 	sub	sl, r3, #65536	; 0x10000
+    8180:	e3b01000 	movs	r1, #0
+    8184:	e1a0b001 	mov	fp, r1
+    8188:	e1a07001 	mov	r7, r1
+    818c:	e59f0078 	ldr	r0, [pc, #120]	; 820c <_mainCRTStartup+0x104>
+    8190:	e59f2078 	ldr	r2, [pc, #120]	; 8210 <_mainCRTStartup+0x108>
+    8194:	e0522000 	subs	r2, r2, r0
+    8198:	eb000067 	bl	833c <memset>
+    819c:	e59f3060 	ldr	r3, [pc, #96]	; 8204 <_mainCRTStartup+0xfc>
+    81a0:	e3530000 	cmp	r3, #0
+    81a4:	0a000001 	beq	81b0 <_mainCRTStartup+0xa8>
+    81a8:	e1a0e00f 	mov	lr, pc
+    81ac:	e1a0f003 	mov	pc, r3
+    81b0:	e59f3050 	ldr	r3, [pc, #80]	; 8208 <_mainCRTStartup+0x100>
+    81b4:	e3530000 	cmp	r3, #0
+    81b8:	0a000001 	beq	81c4 <_mainCRTStartup+0xbc>
+    81bc:	e1a0e00f 	mov	lr, pc
+    81c0:	e1a0f003 	mov	pc, r3
+    81c4:	e3b00000 	movs	r0, #0
+    81c8:	e3b01000 	movs	r1, #0
+    81cc:	e1b04000 	movs	r4, r0
+    81d0:	e1b05001 	movs	r5, r1
+    81d4:	e59f0038 	ldr	r0, [pc, #56]	; 8214 <_mainCRTStartup+0x10c>
+    81d8:	e3500000 	cmp	r0, #0
+    81dc:	0a000001 	beq	81e8 <_mainCRTStartup+0xe0>
+    81e0:	e59f0030 	ldr	r0, [pc, #48]	; 8218 <_mainCRTStartup+0x110>
+    81e4:	eb0000ec 	bl	859c <atexit>
+    81e8:	eb000033 	bl	82bc <__libc_init_array>
+    81ec:	e1b00004 	movs	r0, r4
+    81f0:	e1b01005 	movs	r1, r5
+    81f4:	eb000008 	bl	821c <main>
+    81f8:	ebffff86 	bl	8018 <exit>
+    81fc:	00080000 	.word	0x00080000
+	...
+    820c:	00010b5c 	.word	0x00010b5c
+    8210:	00010b78 	.word	0x00010b78
+    8214:	0000859c 	.word	0x0000859c
+    8218:	000085bc 	.word	0x000085bc
+
+0000821c <main>:
+    821c:	e52db004 	push	{fp}		; (str fp, [sp, #-4]!)
+    8220:	e28db000 	add	fp, sp, #0
+    8224:	e24dd014 	sub	sp, sp, #20
+    8228:	e3a03000 	mov	r3, #0
+    822c:	e50b3008 	str	r3, [fp, #-8]
+    8230:	e3a03000 	mov	r3, #0
+    8234:	e50b300c 	str	r3, [fp, #-12]
+    8238:	e3a03000 	mov	r3, #0
+    823c:	e50b3010 	str	r3, [fp, #-16]
+    8240:	e3a03000 	mov	r3, #0
+    8244:	e50b3014 	str	r3, [fp, #-20]
+    8248:	e59f305c 	ldr	r3, [pc, #92]	; 82ac <main+0x90>
+    824c:	e50b3008 	str	r3, [fp, #-8]
+    8250:	e59f3058 	ldr	r3, [pc, #88]	; 82b0 <main+0x94>
+    8254:	e50b300c 	str	r3, [fp, #-12]
+    8258:	e59f3054 	ldr	r3, [pc, #84]	; 82b4 <main+0x98>
+    825c:	e50b3010 	str	r3, [fp, #-16]
+    8260:	e59f3050 	ldr	r3, [pc, #80]	; 82b8 <main+0x9c>
+    8264:	e50b3014 	str	r3, [fp, #-20]
+    8268:	e51b3008 	ldr	r3, [fp, #-8]
+    826c:	e3e02040 	mvn	r2, #64	; 0x40
+    8270:	e5832000 	str	r2, [r3]
+    8274:	e51b300c 	ldr	r3, [fp, #-12]
+    8278:	e5933000 	ldr	r3, [r3]
+    827c:	e3832040 	orr	r2, r3, #64	; 0x40
+    8280:	e51b300c 	ldr	r3, [fp, #-12]
+    8284:	e5832000 	str	r2, [r3]
+    8288:	e51b2010 	ldr	r2, [fp, #-16]
+    828c:	e5d23000 	ldrb	r3, [r2]
+    8290:	e3833040 	orr	r3, r3, #64	; 0x40
+    8294:	e5c23000 	strb	r3, [r2]
+    8298:	e51b2010 	ldr	r2, [fp, #-16]
+    829c:	e5d23000 	ldrb	r3, [r2]
+    82a0:	e3c33040 	bic	r3, r3, #64	; 0x40
+    82a4:	e5c23000 	strb	r3, [r2]
+    82a8:	eafffff6 	b	8288 <main+0x6c>
+    82ac:	2009c010 	.word	0x2009c010
+    82b0:	2009c000 	.word	0x2009c000
+    82b4:	2009c018 	.word	0x2009c018
+    82b8:	2009c01c 	.word	0x2009c01c
+
+000082bc <__libc_init_array>:
+    82bc:	e92d4070 	push	{r4, r5, r6, lr}
+    82c0:	e59f6064 	ldr	r6, [pc, #100]	; 832c <__libc_init_array+0x70>
+    82c4:	e59f5064 	ldr	r5, [pc, #100]	; 8330 <__libc_init_array+0x74>
+    82c8:	e0656006 	rsb	r6, r5, r6
+    82cc:	e1b06146 	asrs	r6, r6, #2
+    82d0:	13a04000 	movne	r4, #0
+    82d4:	0a000005 	beq	82f0 <__libc_init_array+0x34>
+    82d8:	e2844001 	add	r4, r4, #1
+    82dc:	e4953004 	ldr	r3, [r5], #4
+    82e0:	e1a0e00f 	mov	lr, pc
+    82e4:	e12fff13 	bx	r3
+    82e8:	e1560004 	cmp	r6, r4
+    82ec:	1afffff9 	bne	82d8 <__libc_init_array+0x1c>
+    82f0:	e59f603c 	ldr	r6, [pc, #60]	; 8334 <__libc_init_array+0x78>
+    82f4:	e59f503c 	ldr	r5, [pc, #60]	; 8338 <__libc_init_array+0x7c>
+    82f8:	e0656006 	rsb	r6, r5, r6
+    82fc:	ebffff3f 	bl	8000 <_init>
+    8300:	e1b06146 	asrs	r6, r6, #2
+    8304:	13a04000 	movne	r4, #0
+    8308:	0a000005 	beq	8324 <__libc_init_array+0x68>
+    830c:	e2844001 	add	r4, r4, #1
+    8310:	e4953004 	ldr	r3, [r5], #4
+    8314:	e1a0e00f 	mov	lr, pc
+    8318:	e12fff13 	bx	r3
+    831c:	e1560004 	cmp	r6, r4
+    8320:	1afffff9 	bne	830c <__libc_init_array+0x50>
+    8324:	e8bd4070 	pop	{r4, r5, r6, lr}
+    8328:	e12fff1e 	bx	lr
+    832c:	00010714 	.word	0x00010714
+    8330:	00010714 	.word	0x00010714
+    8334:	0001071c 	.word	0x0001071c
+    8338:	00010714 	.word	0x00010714
+
+0000833c <memset>:
+    833c:	e3100003 	tst	r0, #3
+    8340:	e92d4010 	push	{r4, lr}
+    8344:	0a000037 	beq	8428 <memset+0xec>
+    8348:	e3520000 	cmp	r2, #0
+    834c:	e2422001 	sub	r2, r2, #1
+    8350:	0a000032 	beq	8420 <memset+0xe4>
+    8354:	e201c0ff 	and	ip, r1, #255	; 0xff
+    8358:	e1a03000 	mov	r3, r0
+    835c:	ea000002 	b	836c <memset+0x30>
+    8360:	e3520000 	cmp	r2, #0
+    8364:	e2422001 	sub	r2, r2, #1
+    8368:	0a00002c 	beq	8420 <memset+0xe4>
+    836c:	e4c3c001 	strb	ip, [r3], #1
+    8370:	e3130003 	tst	r3, #3
+    8374:	1afffff9 	bne	8360 <memset+0x24>
+    8378:	e3520003 	cmp	r2, #3
+    837c:	9a000020 	bls	8404 <memset+0xc8>
+    8380:	e201e0ff 	and	lr, r1, #255	; 0xff
+    8384:	e18ee40e 	orr	lr, lr, lr, lsl #8
+    8388:	e352000f 	cmp	r2, #15
+    838c:	e18ee80e 	orr	lr, lr, lr, lsl #16
+    8390:	9a000010 	bls	83d8 <memset+0x9c>
+    8394:	e1a04002 	mov	r4, r2
+    8398:	e283c010 	add	ip, r3, #16
+    839c:	e2444010 	sub	r4, r4, #16
+    83a0:	e354000f 	cmp	r4, #15
+    83a4:	e50ce010 	str	lr, [ip, #-16]
+    83a8:	e50ce00c 	str	lr, [ip, #-12]
+    83ac:	e50ce008 	str	lr, [ip, #-8]
+    83b0:	e50ce004 	str	lr, [ip, #-4]
+    83b4:	e28cc010 	add	ip, ip, #16
+    83b8:	8afffff7 	bhi	839c <memset+0x60>
+    83bc:	e242c010 	sub	ip, r2, #16
+    83c0:	e3ccc00f 	bic	ip, ip, #15
+    83c4:	e202200f 	and	r2, r2, #15
+    83c8:	e28cc010 	add	ip, ip, #16
+    83cc:	e3520003 	cmp	r2, #3
+    83d0:	e083300c 	add	r3, r3, ip
+    83d4:	9a00000a 	bls	8404 <memset+0xc8>
+    83d8:	e1a04003 	mov	r4, r3
+    83dc:	e1a0c002 	mov	ip, r2
+    83e0:	e24cc004 	sub	ip, ip, #4
+    83e4:	e35c0003 	cmp	ip, #3
+    83e8:	e484e004 	str	lr, [r4], #4
+    83ec:	8afffffb 	bhi	83e0 <memset+0xa4>
+    83f0:	e242c004 	sub	ip, r2, #4
+    83f4:	e3ccc003 	bic	ip, ip, #3
+    83f8:	e28cc004 	add	ip, ip, #4
+    83fc:	e083300c 	add	r3, r3, ip
+    8400:	e2022003 	and	r2, r2, #3
+    8404:	e3520000 	cmp	r2, #0
+    8408:	0a000004 	beq	8420 <memset+0xe4>
+    840c:	e20110ff 	and	r1, r1, #255	; 0xff
+    8410:	e0832002 	add	r2, r3, r2
+    8414:	e4c31001 	strb	r1, [r3], #1
+    8418:	e1530002 	cmp	r3, r2
+    841c:	1afffffc 	bne	8414 <memset+0xd8>
+    8420:	e8bd4010 	pop	{r4, lr}
+    8424:	e12fff1e 	bx	lr
+    8428:	e1a03000 	mov	r3, r0
+    842c:	eaffffd1 	b	8378 <memset+0x3c>
+
+00008430 <__call_exitprocs>:
+    8430:	e92d4ff0 	push	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
+    8434:	e1a09000 	mov	r9, r0
+    8438:	e1a06001 	mov	r6, r1
+    843c:	e3a08000 	mov	r8, #0
+    8440:	e59f314c 	ldr	r3, [pc, #332]	; 8594 <__call_exitprocs+0x164>
+    8444:	e5933000 	ldr	r3, [r3]
+    8448:	e24dd00c 	sub	sp, sp, #12
+    844c:	e58d3000 	str	r3, [sp]
+    8450:	e2833f52 	add	r3, r3, #328	; 0x148
+    8454:	e58d3004 	str	r3, [sp, #4]
+    8458:	e59d3000 	ldr	r3, [sp]
+    845c:	e5937148 	ldr	r7, [r3, #328]	; 0x148
+    8460:	e3570000 	cmp	r7, #0
+    8464:	0a000038 	beq	854c <__call_exitprocs+0x11c>
+    8468:	e59da004 	ldr	sl, [sp, #4]
+    846c:	e5974004 	ldr	r4, [r7, #4]
+    8470:	e2545001 	subs	r5, r4, #1
+    8474:	52844001 	addpl	r4, r4, #1
+    8478:	50874104 	addpl	r4, r7, r4, lsl #2
+    847c:	5a000007 	bpl	84a0 <__call_exitprocs+0x70>
+    8480:	ea000022 	b	8510 <__call_exitprocs+0xe0>
+    8484:	e5943100 	ldr	r3, [r4, #256]	; 0x100
+    8488:	e1530006 	cmp	r3, r6
+    848c:	0a000005 	beq	84a8 <__call_exitprocs+0x78>
+    8490:	e2455001 	sub	r5, r5, #1
+    8494:	e3750001 	cmn	r5, #1
+    8498:	e2444004 	sub	r4, r4, #4
+    849c:	0a00001b 	beq	8510 <__call_exitprocs+0xe0>
+    84a0:	e3560000 	cmp	r6, #0
+    84a4:	1afffff6 	bne	8484 <__call_exitprocs+0x54>
+    84a8:	e5973004 	ldr	r3, [r7, #4]
+    84ac:	e2433001 	sub	r3, r3, #1
+    84b0:	e1530005 	cmp	r3, r5
+    84b4:	e5943000 	ldr	r3, [r4]
+    84b8:	05875004 	streq	r5, [r7, #4]
+    84bc:	15848000 	strne	r8, [r4]
+    84c0:	e3530000 	cmp	r3, #0
+    84c4:	0afffff1 	beq	8490 <__call_exitprocs+0x60>
+    84c8:	e3a01001 	mov	r1, #1
+    84cc:	e5972188 	ldr	r2, [r7, #392]	; 0x188
+    84d0:	e1a01511 	lsl	r1, r1, r5
+    84d4:	e1110002 	tst	r1, r2
+    84d8:	e597b004 	ldr	fp, [r7, #4]
+    84dc:	1a00001d 	bne	8558 <__call_exitprocs+0x128>
+    84e0:	e1a0e00f 	mov	lr, pc
+    84e4:	e12fff13 	bx	r3
+    84e8:	e5973004 	ldr	r3, [r7, #4]
+    84ec:	e153000b 	cmp	r3, fp
+    84f0:	1affffd8 	bne	8458 <__call_exitprocs+0x28>
+    84f4:	e59a3000 	ldr	r3, [sl]
+    84f8:	e1530007 	cmp	r3, r7
+    84fc:	1affffd5 	bne	8458 <__call_exitprocs+0x28>
+    8500:	e2455001 	sub	r5, r5, #1
+    8504:	e3750001 	cmn	r5, #1
+    8508:	e2444004 	sub	r4, r4, #4
+    850c:	1affffe3 	bne	84a0 <__call_exitprocs+0x70>
+    8510:	e59f3080 	ldr	r3, [pc, #128]	; 8598 <__call_exitprocs+0x168>
+    8514:	e3530000 	cmp	r3, #0
+    8518:	0a00000b 	beq	854c <__call_exitprocs+0x11c>
+    851c:	e5973004 	ldr	r3, [r7, #4]
+    8520:	e3530000 	cmp	r3, #0
+    8524:	e5973000 	ldr	r3, [r7]
+    8528:	1a000016 	bne	8588 <__call_exitprocs+0x158>
+    852c:	e3530000 	cmp	r3, #0
+    8530:	0a000014 	beq	8588 <__call_exitprocs+0x158>
+    8534:	e1a00007 	mov	r0, r7
+    8538:	e58a3000 	str	r3, [sl]
+    853c:	e1a00000 	nop			; (mov r0, r0)
+    8540:	e59a7000 	ldr	r7, [sl]
+    8544:	e3570000 	cmp	r7, #0
+    8548:	1affffc7 	bne	846c <__call_exitprocs+0x3c>
+    854c:	e28dd00c 	add	sp, sp, #12
+    8550:	e8bd4ff0 	pop	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
+    8554:	e12fff1e 	bx	lr
+    8558:	e597218c 	ldr	r2, [r7, #396]	; 0x18c
+    855c:	e1110002 	tst	r1, r2
+    8560:	1a000004 	bne	8578 <__call_exitprocs+0x148>
+    8564:	e1a00009 	mov	r0, r9
+    8568:	e5941080 	ldr	r1, [r4, #128]	; 0x80
+    856c:	e1a0e00f 	mov	lr, pc
+    8570:	e12fff13 	bx	r3
+    8574:	eaffffdb 	b	84e8 <__call_exitprocs+0xb8>
+    8578:	e5940080 	ldr	r0, [r4, #128]	; 0x80
+    857c:	e1a0e00f 	mov	lr, pc
+    8580:	e12fff13 	bx	r3
+    8584:	eaffffd7 	b	84e8 <__call_exitprocs+0xb8>
+    8588:	e1a0a007 	mov	sl, r7
+    858c:	e1a07003 	mov	r7, r3
+    8590:	eaffffeb 	b	8544 <__call_exitprocs+0x114>
+    8594:	00008704 	.word	0x00008704
+    8598:	00000000 	.word	0x00000000
+
+0000859c <atexit>:
+    859c:	e1a01000 	mov	r1, r0
+    85a0:	e3a00000 	mov	r0, #0
+    85a4:	e92d4008 	push	{r3, lr}
+    85a8:	e1a02000 	mov	r2, r0
+    85ac:	e1a03000 	mov	r3, r0
+    85b0:	eb000013 	bl	8604 <__register_exitproc>
+    85b4:	e8bd4008 	pop	{r3, lr}
+    85b8:	e12fff1e 	bx	lr
+
+000085bc <__libc_fini_array>:
+    85bc:	e92d4038 	push	{r3, r4, r5, lr}
+    85c0:	e59f5034 	ldr	r5, [pc, #52]	; 85fc <__libc_fini_array+0x40>
+    85c4:	e59f3034 	ldr	r3, [pc, #52]	; 8600 <__libc_fini_array+0x44>
+    85c8:	e0653003 	rsb	r3, r5, r3
+    85cc:	e1b04143 	asrs	r4, r3, #2
+    85d0:	10835005 	addne	r5, r3, r5
+    85d4:	0a000005 	beq	85f0 <__libc_fini_array+0x34>
+    85d8:	e2444001 	sub	r4, r4, #1
+    85dc:	e5353004 	ldr	r3, [r5, #-4]!
+    85e0:	e1a0e00f 	mov	lr, pc
+    85e4:	e12fff13 	bx	r3
+    85e8:	e3540000 	cmp	r4, #0
+    85ec:	1afffff9 	bne	85d8 <__libc_fini_array+0x1c>
+    85f0:	eb00003c 	bl	86e8 <_fini>
+    85f4:	e8bd4038 	pop	{r3, r4, r5, lr}
+    85f8:	e12fff1e 	bx	lr
+    85fc:	0001071c 	.word	0x0001071c
+    8600:	00010720 	.word	0x00010720
+
+00008604 <__register_exitproc>:
+    8604:	e59fc0d0 	ldr	ip, [pc, #208]	; 86dc <__register_exitproc+0xd8>
+    8608:	e92d41f0 	push	{r4, r5, r6, r7, r8, lr}
+    860c:	e59c4000 	ldr	r4, [ip]
+    8610:	e594c148 	ldr	ip, [r4, #328]	; 0x148
+    8614:	e35c0000 	cmp	ip, #0
+    8618:	0284cf53 	addeq	ip, r4, #332	; 0x14c
+    861c:	e59ce004 	ldr	lr, [ip, #4]
+    8620:	0584c148 	streq	ip, [r4, #328]	; 0x148
+    8624:	e35e001f 	cmp	lr, #31
+    8628:	e1a06001 	mov	r6, r1
+    862c:	e1a05000 	mov	r5, r0
+    8630:	e1a08002 	mov	r8, r2
+    8634:	e1a07003 	mov	r7, r3
+    8638:	d28e1001 	addle	r1, lr, #1
+    863c:	da00000f 	ble	8680 <__register_exitproc+0x7c>
+    8640:	e59f3098 	ldr	r3, [pc, #152]	; 86e0 <__register_exitproc+0xdc>
+    8644:	e3530000 	cmp	r3, #0
+    8648:	0a000021 	beq	86d4 <__register_exitproc+0xd0>
+    864c:	e3a00e19 	mov	r0, #400	; 0x190
+    8650:	e1a00000 	nop			; (mov r0, r0)
+    8654:	e250c000 	subs	ip, r0, #0
+    8658:	0a00001d 	beq	86d4 <__register_exitproc+0xd0>
+    865c:	e3a00000 	mov	r0, #0
+    8660:	e3a01001 	mov	r1, #1
+    8664:	e1a0e000 	mov	lr, r0
+    8668:	e5943148 	ldr	r3, [r4, #328]	; 0x148
+    866c:	e58c0004 	str	r0, [ip, #4]
+    8670:	e58c3000 	str	r3, [ip]
+    8674:	e584c148 	str	ip, [r4, #328]	; 0x148
+    8678:	e58c0188 	str	r0, [ip, #392]	; 0x188
+    867c:	e58c018c 	str	r0, [ip, #396]	; 0x18c
+    8680:	e3550000 	cmp	r5, #0
+    8684:	1a000005 	bne	86a0 <__register_exitproc+0x9c>
+    8688:	e3a00000 	mov	r0, #0
+    868c:	e28ee002 	add	lr, lr, #2
+    8690:	e58c1004 	str	r1, [ip, #4]
+    8694:	e78c610e 	str	r6, [ip, lr, lsl #2]
+    8698:	e8bd41f0 	pop	{r4, r5, r6, r7, r8, lr}
+    869c:	e12fff1e 	bx	lr
+    86a0:	e3a00001 	mov	r0, #1
+    86a4:	e08c310e 	add	r3, ip, lr, lsl #2
+    86a8:	e5838088 	str	r8, [r3, #136]	; 0x88
+    86ac:	e59c4188 	ldr	r4, [ip, #392]	; 0x188
+    86b0:	e1a02e10 	lsl	r2, r0, lr
+    86b4:	e1840002 	orr	r0, r4, r2
+    86b8:	e58c0188 	str	r0, [ip, #392]	; 0x188
+    86bc:	e5837108 	str	r7, [r3, #264]	; 0x108
+    86c0:	e3550002 	cmp	r5, #2
+    86c4:	059c318c 	ldreq	r3, [ip, #396]	; 0x18c
+    86c8:	01832002 	orreq	r2, r3, r2
+    86cc:	058c218c 	streq	r2, [ip, #396]	; 0x18c
+    86d0:	eaffffec 	b	8688 <__register_exitproc+0x84>
+    86d4:	e3e00000 	mvn	r0, #0
+    86d8:	eaffffee 	b	8698 <__register_exitproc+0x94>
+    86dc:	00008704 	.word	0x00008704
+    86e0:	00000000 	.word	0x00000000
+
+000086e4 <_exit>:
+    86e4:	eafffffe 	b	86e4 <_exit>
+
+Disassembly of section .fini:
+
+000086e8 <_fini>:
+    86e8:	e1a0c00d 	mov	ip, sp
+    86ec:	e92ddff8 	push	{r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr, pc}
+    86f0:	e24cb004 	sub	fp, ip, #4
+    86f4:	e24bd028 	sub	sp, fp, #40	; 0x28
+    86f8:	e89d6ff0 	ldm	sp, {r4, r5, r6, r7, r8, r9, sl, fp, sp, lr}
+    86fc:	e12fff1e 	bx	lr
