@@ -1,5 +1,5 @@
 #include "types.h"
-#include "hw1.h"
+#include "mbed_hw.h"
 
 void main()
 {
