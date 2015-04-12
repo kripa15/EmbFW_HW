@@ -16,4 +16,4 @@ all:
 	$(OBJDUMP) -S hw1.elf > hw1_dmp.txt
 
 clean:
-	rm -rf  hw1 ./*.o
+	rm -rf  hw1_.o hw1.elf hw1_dmp.txt
