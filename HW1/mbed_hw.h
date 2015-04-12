@@ -1,5 +1,5 @@
-#ifndef __GPIO_H
-#define __GPIO_H
+#ifndef __MBED_HW_H
+#define __MBED_HW_H
 
 
 
