@@ -5,7 +5,7 @@
 
 CC   = arm-none-eabi-gcc
 OBJDUMP = arm-none-eabi-objdump
-CFLAGS  = --specs=nosys.specs 
+CFLAGS  = --specs=nosys.specs
 DEPS    = hw1.h
 #EXE    = hw1.elf
 
@@ -16,4 +16,4 @@ all:
 	$(OBJDUMP) -S hw1.elf > hw1_dmp.txt
 
 clean:
-	rm -rf  hw1_.o hw1.elf hw1_dmp.txt
+	rm -rf  hw1*.o hw1.elf hw1_dmp.txt
