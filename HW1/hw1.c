@@ -3,10 +3,10 @@
 
 void main()
 {
-  gpio_reg_t*  gpio_mask0 = NULL;
-  gpio_reg_t*  gpio_dir0  = NULL;
-  gpio_reg_t*  gpio_set0  = NULL;
-  gpio_reg_t*  gpio_clr0  = NULL;
+  volatile gpio_reg_t*  gpio_mask0 = NULL;
+  volatile gpio_reg_t*  gpio_dir0  = NULL;
+  volatile gpio_reg_t*  gpio_set0  = NULL;
+  volatile gpio_reg_t*  gpio_clr0  = NULL;
 
   gpio_mask0 = (gpio_reg_t*)FIO0MASK;
   gpio_dir0  = (gpio_reg_t*)FIO0DIR;
