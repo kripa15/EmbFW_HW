@@ -13,15 +13,18 @@ void main()
   gpio_set0  = (gpio_reg_t*)FIO0SET;
   gpio_clr0  = (gpio_reg_t*)FIO0CLR;
   // Mask out all GPIO but pin6.
-  *(&gpio_mask0->reg)  = GPIOMASK_PIN6_SEL;
+  // Mask out all GPIO but pin6.
+	gpio_mask0->reg = 0xFFFFFFFF;
+  gpio_mask0->pins_t.pin6  = 0;
   // Set gpio pin 6 as output pin.
-  *(&gpio_dir0->reg)    |= ~GPIOMASK_PIN6_SEL;
+  gpio_dir0->pins_t.pin6    = 1;
 
   while (1)
   {
     gpio_set0->pins_t.pin6 = 1;
     
-    gpio_set0->pins_t.pin6 = 0; 
+    gpio_clr0->pins_t.pin6 = 1; 
   }
 
 }
+
