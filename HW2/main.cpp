@@ -480,7 +480,7 @@ int main(void)
 	}
 	else  // sampling mode
 	{	
-		
+		delay_us_i *= 2;
 		if(delay_us_i == 0)
 		{
 			if(freq == 100000000) // 100 MHz sampling
