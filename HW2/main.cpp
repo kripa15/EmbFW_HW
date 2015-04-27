@@ -44,24 +44,28 @@
 #define BUF_LEN  1024
 #define MASK  ((unsigned char )(1))
 
-unsigned int pls_dont_opt;
-
 unsigned char buffer[BUF_LEN];
 // Toggles at 50MHz for 40 cycles and then there is a 3 times long half cycle 
 // Introduced by branch
 
+/*
+ Delay function based on SysTickTimer - counts down every CPU cycle (10ns).
+ In the -O3 optimization mode this delay function seems to get inlined.
+ Thus there is no function call/return overhead
+ The overhead within the loop is about 8 instructions, and one branch
+ So a guesstimate is made and 9 cycles are reduced from each loop/microsecond,
+ ie., 91 cycles.
+*/
 void delay_us(unsigned int us)
 {
 	int i;
-	//*SYS_TICK_LOAD = 1000 - 10;// 900 clock cycles = 900ns 
 	for( i=0 ; i<us ; i++)
   {
-		*SYS_TICK_LOAD = 1000 - 10;
+		*SYS_TICK_LOAD = 90 ;//- overhead;
 		*SYS_TICK_CTRL = 0x5;
 		*SYS_TICK_LOAD = 0; 
 		while(*SYS_TICK_VAL != 0);
   }
-  //printf("timer done\r\n");
 	
 }
 
@@ -250,6 +254,7 @@ void sample_gpio_100MHz(unsigned char *buf)
 	register unsigned char reg8;
 	register unsigned char reg9;
 	register unsigned char reg10;
+
 	volatile unsigned char* FIOPIN1 = &LPC_GPIO0->FIOPIN1;
 
 
@@ -264,6 +269,7 @@ void sample_gpio_100MHz(unsigned char *buf)
   reg9 = *FIOPIN1;
   reg10 = *FIOPIN1;
 
+
 	buf[0] = reg1;
 	buf[1] = reg2;
 	buf[2] = reg3;
@@ -272,8 +278,9 @@ void sample_gpio_100MHz(unsigned char *buf)
 	buf[5] = reg6;
 	buf[6] = reg7;
 	buf[7] = reg8;
-	buf[9] = reg9;
-  buf[10] = reg10;
+	buf[8] = reg9;
+  buf[9] = reg10;
+
 	return ;
 }
 
@@ -477,14 +484,14 @@ float compute_input_freq( unsigned char* buf, unsigned int buf_len, unsigned int
   unsigned int leading_samples;
   int i = 0;
 	
-	printf("\r\n");
+	/*printf("\r\n");
   for (i=0 ; i<buf_len; i++)
 	{
 		printf("%x ", buf[i]);
 
 	}
   printf("\r\n");
-	
+	*/
   i = 0;
 	sample_length = delay_ns; // sample length in ns
 
@@ -523,9 +530,9 @@ float compute_input_freq( unsigned char* buf, unsigned int buf_len, unsigned int
   if(sample_length !=0 && sample_count !=0)
 	{
   	input_freq = ((float)(cycle_count)/(float)(sample_count*sample_length)) * 1000000000;
-		if(delay_ns > 1000)
+		if(buf_len == BUF_LEN)
 		{
-			  printf(" sample count = %u, cycle_count = %u, sample_length = %u\r\n", sample_count, cycle_count, sample_length);
+			  //printf(" sample count = %u, cycle_count = %u, sample_length = %u\r\n", sample_count, cycle_count, sample_length);
 		}
 	}
 	else
@@ -604,20 +611,23 @@ void sample_input_signal()
 	    	input_freq = freq_sum/input_freq_cnt;
 				break;
 		case 2: 
-			printf ("\r\n\r\nEnter freq in Hz (< 500000)\r\n");
+
 	    do
 			{
-			scanf("%u",&freq);
-			}while(freq<1 || freq > 50000);
+				printf ("\r\n\r\nEnter freq in Hz (< 500000)\r\n");
+				scanf("%u",&freq);
+			}while(freq<1 || freq > 500000);
 			delay_us_f = 1000000/(freq*2);
 			delay_us_i = (unsigned int) delay_us_f;
 			printf(" freq = %u, delay = %u, delay_f=%f\r\n", freq, delay_us_i, delay_us_f); 
 			sample_gpio_delay(delay_us_i, buffer, BUF_LEN);
 	    input_freq = compute_input_freq(buffer, BUF_LEN, delay_us_i*1000);
 			break;
+    default:
+			break;
 	}
 
-		printf( "Input frequency estimate = %f Hz", input_freq);
+		printf( "Input frequency estimate = %f Hz\r\n\r\n", input_freq);
 }
 
 void toggle_gpio_pin()
@@ -626,6 +636,7 @@ void toggle_gpio_pin()
   unsigned char           freq_sel;
   unsigned int            freq; 
   float                   delay_us_f;
+  float                   actual_freq;
 
 		do
 		{
@@ -647,16 +658,19 @@ void toggle_gpio_pin()
 				toggle_gpio_50MHz();
 				break;
 			case 2: 
-				printf ("\r\n\r\nEnter freq in Hz (< 500000)\r\n");
 		    do
 				{
+				printf ("\r\n\r\nEnter freq in Hz (< 500000)\r\n");
 				scanf("%u",&freq);
-				}while(freq<1 || freq > 50000);
+				}while(freq<1 || freq > 500000);
 				delay_us_f = 1000000/(freq*2);
 				delay_us_i = (unsigned int) delay_us_f;
-				printf(" freq = %u, delay = %u, delay_f=%f\r\n", freq, delay_us_i, delay_us_f); 
+        actual_freq = 1000000/(delay_us_i*2);
+				printf(" freq = %f, delay = %u, delay_f=%f\r\n", actual_freq, delay_us_i, delay_us_f); 
 				toggle_gpio_delay(delay_us_i);
 				break;
+    default:
+        break;
 		}
    
 }
@@ -673,10 +687,10 @@ int main(void)
   PINMODE0  = (volatile unsigned int*) 0x4002C040;
   *PINMODE0 = 0xFFFFFFFF;
 
- 
+  delay_us(100);
   do
 	{
-		printf ("\r\n\r\nEnter 0 for signal generation, 1 for sampling:\r\n");
+		printf ("\r\nEnter 0 for signal generation, 1 for sampling:\r\n");
 		scanf("%u",&is_generator);
 	}while (!((is_generator == 0)||(is_generator == 1)));
 
@@ -688,6 +702,5 @@ int main(void)
 	{	
 		sample_input_signal();
 	}
-	printf("byebye");
 	return 0;
 }
