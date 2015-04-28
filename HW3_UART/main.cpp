@@ -23,7 +23,7 @@ void send_word()
 {
 	//Set up the word to be sent, by testing switch inputs
 
-	printf("Enter led: 0 - All LEDs, 1 - LED1, 2 - LED2, 3 - LED3, 4 - LED4\r\n");
+	printf("Enter led: 0 - All LEDs, 1 - LED1, 2 - LED2, 3 - LED3\r\n");
 	scanf("%u", &led);
 
 	switch_word=0xa0; //set up a recognisable output pattern
@@ -40,9 +40,6 @@ void send_word()
 			break;
 		case 3:
 			switch_word=switch_word|0x03;
-			break;
-		case 4:
-			switch_word=switch_word|0x04;
 			break;
     default:
 			break;
@@ -64,8 +61,9 @@ void recv_word()
 	led2=0;
 	led3=0;
 	led4=0;
+  printf("Waiting to recv command\r\n");
   while(1)
-{
+  {
 	if (async_port.readable()==1) //is there a character to be read?
 	{
 
@@ -74,11 +72,7 @@ void recv_word()
 
 	}
 	}
-	//set leds according to incoming word from slave
-	led1=0; //preset both to 0
-	led2=0;
-	led3=0;
-	led4=0;
+
 
 	recd_val=recd_val&0x03; //AND out unwanted bits
 
@@ -98,9 +92,6 @@ void recv_word()
 			break;
 		case 3:
 			led3 = 1;
-			break;
-		case 4:
-			led4 = 1;
 			break;
     default:
 			break;
