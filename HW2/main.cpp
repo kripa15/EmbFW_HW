@@ -5,7 +5,9 @@
 #include<stdint.h>
 #include<LPC17xx.h>
 #include<stdio.h>
-/* GPIOs                                                                      */
+/* GPIOs                                             */
+
+//#define DBG_PRINT 1
 #define LPC_GPIO_BASE         (0x2009C000UL)
 
 /*!< Defines 'read / write' permissions              */
@@ -37,9 +39,15 @@
 #define BUF_LEN  2048
 #define MASK  ((unsigned char )(1))
 
+#define SAMPLE_COUNT_100MHz 10
+#define SAMPLE_COUNT_50MHz  32
+
 #define DELAY_100MHZ 10
 #define DELAY_50MHZ  20
 #define DELAY_16MHZ  60
+#define SAMPLE_OVERHEAD 60 // 80ns or 80 cycles overhead for each time the sample_gpio_delay loops.
+
+
 
 unsigned int delay_dont_opt;
 
@@ -69,7 +77,7 @@ void delay_us(unsigned int us)
 	unsigned int i;
 	for( i=0 ; i<us ; i++)
   {
-		*SYS_TICK_LOAD = 94 ;//- overhead;
+		*SYS_TICK_LOAD = 88 ;//- overhead;
 		*SYS_TICK_CTRL = 0x5;
 		*SYS_TICK_LOAD = 0; 
 		while(*SYS_TICK_VAL != 0);
@@ -134,7 +142,7 @@ void toggle_gpio_50MHz(void)
 
 // Toggles at 25MHz for 10 cycles and then there is a 1.5 times long half cycle 
 // Introduced by branch
-void toggle_gpio_25MHz(void)
+__attribute__((optimize("align-loops=4"))) void toggle_gpio_25MHz(void)
 {
 
 	volatile unsigned char* FIOSET2 = &LPC_GPIO0->FIOSET1;
@@ -210,7 +218,7 @@ void toggle_gpio_25MHz(void)
 /* Function that toggles GPIO P0.pin6 at 16.667 MHz
   which is the fastest possible 50-50 dutycycle frequency
   that is achievable with mbed runing at 96 MHz (10ns time period) */
-void toggle_gpio_16MHz(void)
+__attribute__((optimize("align-loops=4"))) void toggle_gpio_16MHz(void)
 {
 
 	volatile unsigned char* FIOSET2 = &LPC_GPIO0->FIOSET1;
@@ -235,7 +243,7 @@ void toggle_gpio_16MHz(void)
 /* Function that toggles GPIO P0.pin6 at 16.667 MHz
   which is the fastest possible 50-50 dutycycle frequency
   that is achievable with mbed runing at 96 MHz (10ns time period) */
-void toggle_gpio_4MHz(void)
+__attribute__((optimize("align-loops=4"))) void toggle_gpio_4MHz(void)
 {
 
 	volatile unsigned char* FIOSET2 = &LPC_GPIO0->FIOSET1;
@@ -244,7 +252,13 @@ void toggle_gpio_4MHz(void)
 	LPC_GPIO0->FIODIR1 = MASK;
   LPC_GPIO0->FIOMASK1 = ~(MASK);
 	while (1) 
-	{ 
+	{
+    unsigned int register sys_tick_val; 
+  /*
+		*SYS_TICK_LOAD = 500 ;//- overhead;
+		*SYS_TICK_CTRL = 0x5;
+		*SYS_TICK_LOAD = 0; */
+
     // GPIO is kept SET for 3 cycles, to balance 
     // 2 cycles of CLR state during branch to the 
     // beginning of the loop.
@@ -271,6 +285,7 @@ void toggle_gpio_4MHz(void)
 		*FIOCLR2 = MASK;
 		*FIOCLR2 = MASK;
 		*FIOCLR2 = MASK;
+    //sys_tick_val = *SYS_TICK_VAL;
 
 	}
 
@@ -299,7 +314,46 @@ void toggle_gpio_delay(unsigned int us)
 	}
 
 }
-void sample_gpio_100MHz(unsigned char *buf)
+
+void toggle_gpio_multiple60ns( unsigned int delay)
+{
+	 unsigned int i,j;
+	volatile unsigned char* FIOSET2 = &LPC_GPIO0->FIOSET1;
+	volatile unsigned char* FIOCLR2 = &LPC_GPIO0->FIOCLR1;
+
+	LPC_GPIO0->FIODIR1 = MASK;
+  LPC_GPIO0->FIOMASK1 = ~(MASK);
+	while(1)
+	{
+		*FIOSET2 = MASK;
+    *FIOSET2 = MASK;
+    *FIOSET2 = MASK;
+		//*FIOSET2 = MASK;
+    //*FIOSET2 = MASK;
+    //*FIOSET2 = MASK;
+    //*FIOSET2 = MASK;
+    //for(j=0; j<delay ; j++);
+     __asm("push {r3} \r\n"
+           "mov r3, #0\r\n"   
+      "loop1:     adds	r3, #1\r\n"
+           "cmp	r3, r0\r\n"
+           "bne.n   loop1\r\n"
+           "pop {r3}");
+    //*FIOCLR2 = MASK;
+    //*FIOCLR2 = MASK;
+    *FIOCLR2 = MASK;
+    //*FIOCLR2 = MASK;
+     __asm("push {r3} \r\n"
+           "mov r3, #0\r\n"   
+      "loop2:     adds	r3, #1\r\n"
+           "cmp	r3, r0\r\n"
+           "bne.n   loop2\r\n"
+           "pop {r3}");
+	}
+}
+
+
+__attribute__((optimize("no-inline"))) void sample_gpio_100MHz(unsigned char *buf)
 {
 	register unsigned char reg1;
 	register unsigned char reg2;
@@ -316,8 +370,11 @@ void sample_gpio_100MHz(unsigned char *buf)
 
   LPC_GPIO0->FIOMASK1 = ~(MASK);
   LPC_GPIO0->FIODIR1 = 0;
-
-
+/*
+		*SYS_TICK_LOAD = 100 ;//- overhead;
+		*SYS_TICK_CTRL = 0x5;
+		*SYS_TICK_LOAD = 0; 
+*/
 	reg1 = *FIOPIN1;
 	reg2 = *FIOPIN1;
 	reg3 = *FIOPIN1;
@@ -341,10 +398,12 @@ void sample_gpio_100MHz(unsigned char *buf)
 	buf[8] = reg9;
   buf[9] = reg10;
 
+ //printf("sys_tick_val= %u \r\n", *SYS_TICK_VAL);
+
 	return ;
 }
 
-void sample_gpio_50MHz(unsigned char *buf)
+__attribute__((optimize("no-inline"))) void sample_gpio_50MHz(unsigned char *buf)
 {
 	register unsigned char reg1;
 	volatile unsigned char* FIOPIN1 = &LPC_GPIO0->FIOPIN1;
@@ -352,7 +411,11 @@ void sample_gpio_50MHz(unsigned char *buf)
 
   LPC_GPIO0->FIOMASK1 = ~(MASK);
   LPC_GPIO0->FIODIR1 = 0;
-
+/*
+		*SYS_TICK_LOAD = 500 ;//- overhead;
+		*SYS_TICK_CTRL = 0x5;
+		*SYS_TICK_LOAD = 0; 
+*/
 	reg1 = *FIOPIN1;
 	buf[0] = reg1;
 	reg1 = *FIOPIN1;
@@ -401,10 +464,28 @@ void sample_gpio_50MHz(unsigned char *buf)
 	buf[22] = reg1;
 	reg1 = *FIOPIN1;
 	buf[23] = reg1;
+	reg1 = *FIOPIN1;
+	buf[24] = reg1;
+	reg1 = *FIOPIN1;
+	buf[25] = reg1;
+	reg1 = *FIOPIN1;
+	buf[26] = reg1;
+	reg1 = *FIOPIN1;
+	buf[27] = reg1;
+	reg1 = *FIOPIN1;
+	buf[28] = reg1;
+	reg1 = *FIOPIN1;
+	buf[29] = reg1;
+	reg1 = *FIOPIN1;
+	buf[30] = reg1;
+	reg1 = *FIOPIN1;
+	buf[31] = reg1;
+
+  //printf ("SYS_TICK_VAL = %u\r\n", *SYS_TICK_VAL);
 	return ;
 }
 
-void sample_gpio_16MHz(unsigned char *buf, int buf_len)
+__attribute__((optimize("align-loops=4"))) void sample_gpio_16MHz(unsigned char *buf, int buf_len)
 {
 	int i;
 	volatile unsigned char* FIOPIN1 = &LPC_GPIO0->FIOPIN1;
@@ -412,15 +493,32 @@ void sample_gpio_16MHz(unsigned char *buf, int buf_len)
 
   LPC_GPIO0->FIOMASK1 = ~(MASK);
   LPC_GPIO0->FIODIR1 = 0;
+	/*	*SYS_TICK_LOAD = 20000 ;//- overhead;
+		*SYS_TICK_CTRL = 0x5;
+		*SYS_TICK_LOAD = 0; */
+
 	for(i=0 ; i<buf_len ; i++)
 	{
 
 		buffer[i] = *FIOPIN1;
 
 	}
-
+ // printf("sys_tick_val = %u \r\n", *SYS_TICK_VAL);
 }
 
+void sample_gpio_multiple60ns(unsigned char *buf, unsigned int delay)
+{
+	int i,j;
+	volatile unsigned char* FIOPIN1 = &LPC_GPIO0->FIOPIN1;
+
+  LPC_GPIO0->FIOMASK1 = ~(MASK);
+  LPC_GPIO0->FIODIR1 = 0;
+	for(i=0 ; i<BUF_LEN ; i++)
+	{
+		buffer[i] = *FIOPIN1;
+    for(j=0; j<delay ; j++);
+	}
+}
 
 void sample_gpio_delay(unsigned int us, unsigned char *buf, int buf_len)
 {
@@ -451,7 +549,7 @@ float compute_input_freq( unsigned char* buf, unsigned int buf_len, unsigned int
   float input_freq;
   unsigned int leading_samples;
   unsigned int i = 0;
-	/*
+#ifdef DBG_PRINT //== 1
 	printf("\r\n");
   for (i=0 ; i<buf_len; i++)
 	{
@@ -459,11 +557,11 @@ float compute_input_freq( unsigned char* buf, unsigned int buf_len, unsigned int
 
 	}
   printf("\r\n");
-	*/
+#endif	
   i = 0;
   if(delay_ns >= 1000)
 	{
-		delay_ns+=40;
+		delay_ns+=SAMPLE_OVERHEAD;
 	}
 	sample_length = delay_ns; // sample length in ns
 
@@ -505,15 +603,17 @@ float compute_input_freq( unsigned char* buf, unsigned int buf_len, unsigned int
   if(sample_length !=0 && sample_count !=0)
 	{
   	input_freq = ((float)(cycle_count)/(float)(sample_count*sample_length)) * 1000000000;
-		if(buf_len == BUF_LEN)
-		{
-		  //printf(" sample count = %u, cycle_count = %u, sample_length = %u\r\n", sample_count, cycle_count, sample_length);
-		}
+
+#ifdef DBG_PRINT // == 1
+		  printf(" sample count = %u, cycle_count = %u, sample_length = %u\r\n", sample_count, cycle_count, sample_length);
+#endif
+
 	}
 	else
 	{
 		input_freq = 0;
 	}
+
 	return input_freq;
 
 }
@@ -525,7 +625,7 @@ void sample_input_signal(unsigned int delay_ns, unsigned int sample_cnt)
 	float        						input_freq;
 	float        						freq_sum = 0;
   unsigned int i;
-  if(delay_ns<=20)
+  if(delay_ns<=DELAY_50MHZ)
   {
 			//printf("fast sample \r\n");
 			while(p < &buffer[BUF_LEN - 1]) 
@@ -577,9 +677,9 @@ void sample_input_signal(unsigned int delay_ns, unsigned int sample_cnt)
 		      input_freq_cnt++;
 				}
 			}
-   input_freq = freq_sum/input_freq_cnt;
+   
 	}
-  
+  input_freq = freq_sum/input_freq_cnt;
 
 	printf( "Input frequency estimate = %f Hz\r\n\r\n", input_freq);
 
@@ -607,12 +707,12 @@ void sel_sample_rate()
 	{
 		case 0: // 50000000 Hz
 			delay_ns =  DELAY_50MHZ ;
-      sample_input_signal(delay_ns, 24);
+      sample_input_signal(delay_ns, SAMPLE_COUNT_50MHz);
 
 			break;
 		case 1: // 100000000 Hz
 	      delay_ns =  DELAY_100MHZ ;	
-        sample_input_signal(delay_ns, 10);
+        sample_input_signal(delay_ns, SAMPLE_COUNT_100MHz);
 				break;
 		case 2: // 16MHz
 	      delay_ns =  DELAY_16MHZ ;	
@@ -626,10 +726,13 @@ void sel_sample_rate()
 				scanf("%u",&sample_freq);
 			}while(sample_freq<1 || sample_freq > 500000);
 
+
 			delay_us_f = 1000000/(sample_freq*2);
 			delay_us_i = (unsigned int) delay_us_f;
+      delay_ns = delay_us_i*1000;
+      sample_freq = 1000000000/delay_ns;
 			printf(" sample_freq = %u, delay = %u, delay_f=%f\r\n", sample_freq, delay_us_i, delay_us_f); 
-      sample_input_signal(delay_us_i*1000, BUF_LEN);
+      sample_input_signal(delay_ns, BUF_LEN);
 			break;
     default:
 			break;
@@ -648,7 +751,7 @@ void toggle_gpio_pin()
 
 		do
 		{
-		printf ("\r\n\r\nEnter freq sel 0: 16.67 MHz, 1: 25 MHz, , 2: 4MHz, 3: freq in Hz (< 500000)\r\n");
+		printf ("\r\n\r\n Select freq- 0:16.67 MHz, 1:25 MHz, 2:4MHz, 3:freq in Hz < 500000\r\n");
 		scanf("%hhu",&freq_sel);
 		}while (freq_sel > 4);
 		switch(freq_sel)
@@ -664,6 +767,7 @@ void toggle_gpio_pin()
 			case 2: freq = 4166667;
 				printf("toggling at 4166667 Hz\r\n");
 				toggle_gpio_4MHz();
+        // toggle_gpio_multiple60ns(2);
 				break;
       case 4:
 				printf("toggling at 50000000 Hz\r\n");
@@ -672,13 +776,14 @@ void toggle_gpio_pin()
 			case 3: 
 		    do
 				{
-				printf ("\r\n\r\nEnter freq in Hz (< 500000)\r\n");
+				printf ("\r\n\r\nEnter freq in Hz <= 500000\r\n");
 				scanf("%u",&freq);
 				}while(freq<1 || freq > 500000);
 				delay_us_f = 1000000/(freq*2);
-				delay_us_i = (unsigned int) delay_us_f;
+				delay_us_i = (unsigned int) (delay_us_f+0.03);
+        if(delay_us_i != 0)
         actual_freq = 1000000/(delay_us_i*2);
-				printf(" freq = %f, delay = %u, delay_f=%f\r\n", actual_freq, delay_us_i, delay_us_f); 
+				printf(" actual signal freq = %f, delay = %u\r\n", actual_freq, delay_us_i);         
 				toggle_gpio_delay(delay_us_i);
 				break;
     default:
